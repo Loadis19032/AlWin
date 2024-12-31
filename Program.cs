@@ -104,8 +104,6 @@ while (true)
         IntPtr sceneNode = swed.ReadPointer(currentPawn, m_pGameSceneNode);
         IntPtr boneMatrix = swed.ReadPointer(sceneNode, m_modelState + 0x80);
 
-        if (renderer.RadarHack)
-            swed.WriteBool(currentPawn, m_entitySpottedState + m_bSpotted, true);
 
         Entity entity = new Entity();
 
@@ -122,12 +120,15 @@ while (true)
         entity.viewOffset = swed.ReadVec(currentPawn, m_vecViewOffset);
         entity.position2D = Calculate.WorldToScreen(viewMatrix, entity.position, screenSize);
         entity.viewPosition2D = Calculate.WorldToScreen(viewMatrix, Vector3.Add(entity.position, entity.viewOffset), screenSize);
-        entity.distance = Vector3.Distance(entity.position, localPlayer.position);
+        entity.distance = Vector3.Distance(entity.origin, localPlayer.origin);
         entity.bones = Calculate.ReadBones(boneMatrix, swed);
         entity.bones2d = Calculate.ReadBones2d(entity.bones, viewMatrix, screenSize);
+        entity.head = swed.ReadVec(boneMatrix, 6 * 32);
 
         ViewMatrix viewmatrix = ReadMatrix(client + dwViewMatrix);
-        //entity.head2d = Calculate.WorldToScreen(viewmatrix, entity.head2d);
+        entity.head2d = Calculate.WorldToScreenAim(viewmatrix, entity.head, screenSize);
+        entity.pixelDistance = Vector2.Distance(entity.head2d, new Vector2(screenSize.X / 2, screenSize.Y / 2)); 
+
         entities.Add(entity);
 
         Console.WriteLine($"{entity.health}hp, distance: {(int)(entity.distance) / 100}m");
@@ -136,24 +137,26 @@ while (true)
 
     }
 
-    entities = entities.OrderBy(o => o.distance).ToList();
+    entities = entities.OrderBy(o => o.pixelDistance).ToList();
 
     if (entities.Count > 0 && GetAsyncKeyState(0x58) < 0 && renderer.enableAimBot)
     {
         Vector3 playerView = Vector3.Add(localPlayer.origin, localPlayer.view);
         Vector3 entityView = Vector3.Add(entities[0].origin, entities[0].view);
     
-        Vector2 newAngles = Calculate.CalculatingAngles(playerView, entityView);
-        Vector3 newAnglesVec3 = new Vector3(newAngles.Y, newAngles.X, 0.0f);
+        if (entities[0].pixelDistance < renderer.aimFov)
+        {
+            Vector2 newAngles = Calculate.CalculatingAngles(playerView, entities[0].head);
+            Vector3 newAnglesVec3 = new Vector3(newAngles.Y, newAngles.X, 0.0f);
 
-        swed.WriteVec(client, dwViewAngles, newAnglesVec3);
-    
+            swed.WriteVec(client, dwViewAngles, newAnglesVec3);
+        }
     }
 
     renderer.UpdateLocalPlayer(localPlayer);
     renderer.UpdateEntities(entities);
 
-    Thread.Sleep(1);
+    Thread.Sleep(5);
 }
 
 [DllImport("user32.dll")]

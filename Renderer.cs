@@ -52,7 +52,7 @@ namespace AlWin
 
         protected override void Render()
         {
-            ImGui.Begin("ALWin v0.1");
+            ImGui.Begin("ALWin v0.2");
 
             ImGui.Text("Visuals");
             ImGui.Separator();
@@ -64,7 +64,6 @@ namespace AlWin
             ImGui.Checkbox("ESP Line", ref enableLine);
             ImGui.Checkbox("ESP Name", ref enableName);
             ImGui.Checkbox("ESP Bone", ref enableBone);
-            ImGui.Checkbox("ESP Only Enemy", ref enableOnlyEnemy);
 
             ImGui.Separator();
 
@@ -83,12 +82,12 @@ namespace AlWin
 
             ImGui.Checkbox("AimBot Enable", ref enableAimBot);
             ImGui.Checkbox("AimBot On Team", ref enableOnTeam);
-            //ImGui.SliderFloat("AimBot Fov", ref aimFov, 10, 300);
+            ImGui.SliderFloat("AimBot Fov", ref aimFov, 10, 300);
 
             ImGui.Text("AimBot HOTKEY 'x'");
 
-            //if (ImGui.CollapsingHeader("FOV circle color"))
-             //   ImGui.ColorPicker4("##circlecolor", ref circleColor);
+            if (ImGui.CollapsingHeader("FOV circle color"))
+                ImGui.ColorPicker4("##circlecolor", ref circleColor);
 
             ImGui.Separator();
             ImGui.Text("Utils");
@@ -97,12 +96,15 @@ namespace AlWin
             ImGui.SliderInt("FOV (no work)", ref fov, 58, 140);
             //ImGui.Checkbox("Radar Hack", ref RadarHack);
 
+            ImGui.Separator();
+            ImGui.Text("official tg: https://t.me/AlWinSoft");
+
             DrawOverlay(screenSize);
             drawList = ImGui.GetWindowDrawList();
             
             if (enableAimBot)
             {
-                //drawList.AddCircle(new Vector2(screenSize.X / 2, screenSize.Y / 2), aimFov, ImGui.ColorConvertFloat4ToU32(circleColor));
+                drawList.AddCircle(new Vector2(screenSize.X / 2, screenSize.Y / 2), aimFov, ImGui.ColorConvertFloat4ToU32(circleColor));
             }
 
             if (enableESP)

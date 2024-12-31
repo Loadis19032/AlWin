@@ -14,6 +14,7 @@ namespace AlWin
         public Vector2 position2D { get; set; }
         public Vector2 viewPosition2D { get; set; }
         public int team { get; set; }
+        public Vector3 head { get; set; }
         public Vector2 head2d { get; set; }
         public int health { get; set; }
         public bool spotted { get; set; }
@@ -22,11 +23,12 @@ namespace AlWin
         public List<Vector2> bones2d { get; set; }
         public float distance { get; set; }
         public IntPtr pawnAddress { get; set; }
-        //public 
+        public float pixelDistance { get; set; }
         public IntPtr controllerAddress { get; set; }
         public Vector3 origin { get; set; }
         public Vector3 view {  get; set; }
         public uint lifeState { get; set; }
+        
 
         public string name_money;
         public int account, cashSpent, cashSpentTotal;
